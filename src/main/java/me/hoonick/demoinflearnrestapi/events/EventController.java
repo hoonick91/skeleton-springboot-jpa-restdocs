@@ -1,27 +1,38 @@
 package me.hoonick.demoinflearnrestapi.events;
 
 
+import org.modelmapper.ModelMapper;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.net.URI;
 
-import static org.springframework.hateoas.server.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.ControllerLinkBuilder.methodOn;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
 @Controller
-@RequestMapping(value = "/api/events", produces = MediaTypes.HAL_JSON_VALUE)
+@RequestMapping(value = "/api/events", produces = MediaTypes.HAL_JSON_VALUE+";charset=utf-8")
 public class EventController {
 
-    @ResponseBody
+    private final EventRepository eventRepository;
+
+    private final ModelMapper modelMapper;
+
+    public EventController(EventRepository eventRepository, ModelMapper modelMapper) {
+        this.eventRepository = eventRepository;
+        this.modelMapper = modelMapper;
+    }
+
     @PostMapping
-    public ResponseEntity createEvent(Event event) {
-        URI createdUri = linkTo(EventController.class).slash("{id}").toUri();
-        event.setId(10);
+    public ResponseEntity createEvent(@RequestBody EventDto eventDto) {
+
+        Event event = modelMapper.map(eventDto, Event.class);
+        Event newEvent = eventRepository.save(event);
+
+        URI createdUri = linkTo(EventController.class).slash(newEvent.getId()).toUri();
         return ResponseEntity.created(createdUri).body(event);
 
     }
