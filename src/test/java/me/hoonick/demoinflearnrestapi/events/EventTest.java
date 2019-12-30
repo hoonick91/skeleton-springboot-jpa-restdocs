@@ -1,9 +1,14 @@
 package me.hoonick.demoinflearnrestapi.events;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@RunWith(JUnitParamsRunner.class)
 public class EventTest {
 
     @Test
@@ -16,7 +21,7 @@ public class EventTest {
     }
 
     @Test
-    public void javaBean(){
+    public void javaBean() {
 
         // Given
         String name = "Event";
@@ -33,6 +38,55 @@ public class EventTest {
         assertThat(event.getDescription()).isEqualTo(description);
     }
 
+    public Object[] parametersForTestFree() {
+        return new Object[]{
+                new Object[]{0, 0, true},
+                new Object[]{0, 100, false},
+                new Object[]{100, 200, false},
+                new Object[]{100, 0, false},
+        };
+    }
+
+    @Test
+    @Parameters
+    public void testFree(int basePrice, int maxPrice, boolean isFree) {
+
+        // Given
+        Event event = Event.builder()
+                .basePrice(basePrice)
+                .maxPrice(maxPrice)
+                .build();
+        // When
+        event.update();
+
+        // Then
+        assertThat(event.isFree()).isEqualTo(isFree);
+
+    }
+
+
+    public Object[] parametersForTestOffline() {
+        return new Object[]{
+                new Object[]{"강남역", true},
+                new Object[]{"", false},
+                new Object[]{null, false}
+        };
+    }
+
+    @Test
+    @Parameters
+    public void testOffline(String location, boolean isOffline) {
+        // Given
+        Event event = Event.builder()
+                .location(location)
+                .build();
+        // When
+        event.update();
+
+        // Then
+        assertThat(event.isOffline()).isEqualTo(isOffline);
+
+    }
 
 
 }
