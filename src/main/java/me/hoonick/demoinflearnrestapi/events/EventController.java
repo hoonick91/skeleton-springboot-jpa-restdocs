@@ -39,12 +39,10 @@ public class EventController {
             return ResponseEntity.badRequest().body(errors);
         }
 
-
         eventValidator.validate(eventDto, errors);
         if (errors.hasErrors()) {
             return ResponseEntity.badRequest().body(errors);
         }
-
 
         Event event = modelMapper.map(eventDto, Event.class);
         event.update();
